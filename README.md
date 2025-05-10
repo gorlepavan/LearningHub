@@ -19,7 +19,7 @@ The Interactive Learning Hub offers:
 
 | Layer     | Technology           |
 |-----------|----------------------|
-| Frontend  | ⚛️ React (Vite), Tailwind CSS, Framer Motion, Shadcn UI |
+| Frontend  | ⚛️ React (Vite), CSS, Framer Motion, Shadcn UI |
 | Backend   | ☕ Spring Boot, REST APIs, JWT Auth |
 | Database  | 🗃️ PostgreSQL / MySQL |
 
