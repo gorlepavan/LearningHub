@@ -1,27 +1,27 @@
 # 🌟 Interactive Learning Hub
 
-Welcome to the *Interactive Learning Hub* – a *modern, **responsive, and **immersive* platform designed to *elevate learning experiences* for students, educators, and lifelong learners.  
-Built with ⚛ *React + Vite* on the frontend and ☕ *Spring Boot* on the backend, this project is a perfect blend of aesthetics and performance.
+Welcome to the **Interactive Learning Hub** – a **modern**, **responsive**, and **immersive** platform designed to **elevate learning experiences** for students, educators, and lifelong learners.  
+Built with ⚛️ **React + Vite** on the frontend and ☕ **Spring Boot** on the backend, this project is a perfect blend of aesthetics and performance.
 
 ---
 
 ## 🧠 What is the Interactive Learning Hub?
 
 The Interactive Learning Hub offers:
-- 📘 *Interactive learning modules* for different subjects
-- 🧪 *Dynamic quizzes* to test your understanding
-- 🧭 *Personalized learning paths* based on progress
-- 🖥 *Responsive UI/UX* for all devices
+- 📘 **Interactive learning modules** for different subjects
+- 🧪 **Dynamic quizzes** to test your understanding
+- 🧭 **Personalized learning paths** based on progress
+- 🖥️ **Responsive UI/UX** for all devices
 
 ---
 
-## ⚙ Tech Stack
+## ⚙️ Tech Stack
 
 | Layer     | Technology           |
 |-----------|----------------------|
-| Frontend  | ⚛ React (Vite), Tailwind CSS, Framer Motion, Shadcn UI |
+| Frontend  | ⚛️ React (Vite), Tailwind CSS, Framer Motion, Shadcn UI |
 | Backend   | ☕ Spring Boot, REST APIs, JWT Auth |
-| Database  | 🗃 PostgreSQL / MySQL |
+| Database  | 🗃️ PostgreSQL / MySQL |
 
 ---
 
@@ -29,27 +29,27 @@ The Interactive Learning Hub offers:
 
 Clone the repository and spin up the project in minutes!
 
-bash
+```bash
 git clone https://github.com/yourusername/interactive-learning-hub.git
 cd interactive-learning-hub
+```
 
+### ▶️ Frontend Setup
 
-### ▶ Frontend Setup
-
-bash
+```bash
 cd frontend
 npm install
 npm run dev
-
+```
 
 ### ☕ Backend Setup
 
-bash
+```bash
 cd backend
 ./mvnw spring-boot:run
+```
 
-
-💡 *Ensure your application.properties is configured with the correct database credentials.*
+💡 *Ensure your `application.properties` is configured with the correct database credentials.*
 
 ---
 
@@ -65,7 +65,7 @@ cd backend
 
 ---
 
-bash
+```bash
 # 1. Fork the repo
 # 2. Create your branch
 git checkout -b feature-xyz
@@ -76,8 +76,8 @@ git commit -m "Add amazing feature"
 git push origin feature-xyz
 
 # 5. Open a Pull Request 🚀
-
+```
 
 
 ---
-"Empowering education through technology."
+_"Empowering education through technology."_
