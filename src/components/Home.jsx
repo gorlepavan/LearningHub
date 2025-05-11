@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-export default function Home() {
-  const [username, setUsername] = useState('');
-  const [enrolledCourses, setEnrolledCourses] = useState([]);
+const Home = () => {
   const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   useEffect(() => {
     // Check if user is logged in
@@ -13,12 +15,55 @@ export default function Home() {
       navigate('/login');
     } else {
       setUsername(un);
+      
+      // Fetch courses from the API
+      fetchCourses();
     }
-    
-    // Get enrolled courses
-    const enrolled = JSON.parse(localStorage.getItem('enrolledCourses') || '[]');
-    setEnrolledCourses(enrolled);
   }, [navigate]);
+  
+  const fetchCourses = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('http://localhost:8081/api/courses');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch courses');
+      }
+      
+      const data = await response.json();
+      setCourses(data);
+      
+      // As a fallback, also check localStorage to show any courses added there
+      const localCourses = localStorage.getItem('courses');
+      if (localCourses) {
+        const parsedLocalCourses = JSON.parse(localCourses);
+        // Merge API courses with local courses, avoiding duplicates by ID
+        const allCourseIds = new Set(data.map(course => course.id));
+        const uniqueLocalCourses = parsedLocalCourses.filter(course => !allCourseIds.has(course.id));
+        setCourses([...data, ...uniqueLocalCourses]);
+      }
+      
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching courses:', err);
+      setError('Failed to load courses. Please try again later.');
+      
+      // If API fails, try to load from localStorage as backup
+      const localCourses = localStorage.getItem('courses');
+      if (localCourses) {
+        setCourses(JSON.parse(localCourses));
+      } else {
+        // If no localStorage data, show default courses as fallback
+        setCourses([
+          { id: 1, title: 'Introduction to Web Development', category: 'Development', description: 'Learn the basics of HTML, CSS, and JavaScript', level: 'Beginner' },
+          { id: 2, title: 'Advanced JavaScript', category: 'Development', description: 'Master modern JavaScript concepts', level: 'Intermediate' },
+          { id: 3, title: 'Data Science Fundamentals', category: 'Data Science', description: 'Introduction to data analysis with Python', level: 'Beginner' }
+        ]);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   
   const handleLogout = () => {
     localStorage.removeItem('un');
@@ -28,95 +73,85 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Navigation bar with username display */}
-      <nav className="bg-gradient-to-r from-cyan-600 to-indigo-600 py-4 px-6 flex justify-between items-center">
-        <div className="flex items-center">
-          <span className="text-white text-xl font-bold">Learning Hub</span>
-        </div>
-        
-        <ul className="flex space-x-6">
-          <li>
-            <a href="#" className="text-white hover:text-cyan-200">Home</a>
-          </li>
-          <li>
-            <a href="#" className="text-white hover:text-cyan-200">Courses</a>
-          </li>
-          <li>
-            <a href="#" className="text-white hover:text-cyan-200">Resources</a>
-          </li>
-        </ul>
-        
-        <div className="flex items-center space-x-4">
-          <span className="text-white font-medium">Welcome, {username}</span>
-          <button 
-            onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm transition duration-300"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
-      
-      {/* Main content */}
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold text-center mb-8 text-indigo-700">Welcome to Learning Hub</h1>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Web Development Course card */}
-          <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
-            {enrolledCourses.includes('web-development') && (
-              <div className="float-right -mt-2 -mr-2">
-                <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                  Enrolled
-                </span>
-              </div>
-            )}
-            <h2 className="text-xl font-semibold mb-3 text-indigo-600">Web Development</h2>
-            <p className="text-gray-600 mb-4">Learn HTML, CSS, JavaScript and more to build amazing websites.</p>
-            <Link to="/course/web-development">
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
-                {enrolledCourses.includes('web-development') ? 'Continue Learning' : 'Explore Course'}
-              </button>
-            </Link>
+      {/* Header/Navigation */}
+      <header className="bg-white shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+          <h1 className="text-xl font-bold text-indigo-600">Learning Hub</h1>
+          <div className="flex items-center space-x-4">
+            <span>Welcome, {username}</span>
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded transition duration-200"
+            >
+              Logout
+            </button>
           </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Featured Courses Section */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Available Courses</h2>
           
-          {/* Data Science Course card */}
-          <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
-            {enrolledCourses.includes('data-science') && (
-              <div className="float-right -mt-2 -mr-2">
-                <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                  Enrolled
-                </span>
-              </div>
-            )}
-            <h2 className="text-xl font-semibold mb-3 text-indigo-600">Data Science</h2>
-            <p className="text-gray-600 mb-4">Master data analysis, visualization and machine learning concepts.</p>
-            <Link to="/course/data-science">
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
-                {enrolledCourses.includes('data-science') ? 'Continue Learning' : 'Explore Course'}
-              </button>
-            </Link>
-          </div>
+          {loading ? (
+            <div className="text-center py-10">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent"></div>
+              <p className="mt-2 text-gray-600">Loading courses...</p>
+            </div>
+          ) : error ? (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <strong className="font-bold">Error!</strong>
+              <span className="block sm:inline"> {error}</span>
+            </div>
+          ) : courses.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {courses.map((course) => (
+                <div key={course.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
+                  <div className="p-6">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-xl font-semibold text-gray-800 mb-2">{course.title}</h3>
+                      <span className="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-full font-medium">
+                        {course.level || 'Beginner'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-500 mb-1">{course.category}</p>
+                    <p className="text-gray-600 mb-4 line-clamp-3">{course.description}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-500">{course.students || 0} students</span>
+                      <button 
+                        onClick={() => navigate(`/course/${course.id}`)}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md text-sm transition duration-200"
+                      >
+                        View Course
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white p-6 rounded-lg shadow-md text-center">
+              <p className="text-gray-500">No courses available yet. Check back later!</p>
+            </div>
+          )}
+        </section>
+        
+        {/* My Enrolled Courses Section */}
+        <section>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">My Enrolled Courses</h2>
           
-          {/* Mobile App Development Course card */}
-          <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
-            {enrolledCourses.includes('mobile-app-development') && (
-              <div className="float-right -mt-2 -mr-2">
-                <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                  Enrolled
-                </span>
-              </div>
-            )}
-            <h2 className="text-xl font-semibold mb-3 text-indigo-600">Mobile App Development</h2>
-            <p className="text-gray-600 mb-4">Create cross-platform mobile applications using React Native.</p>
-            <Link to="/course/mobile-app-development">
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
-                {enrolledCourses.includes('mobile-app-development') ? 'Continue Learning' : 'Explore Course'}
-              </button>
-            </Link>
+          <div className="bg-white p-6 rounded-lg shadow-md text-center">
+            <p className="text-gray-500">You haven't enrolled in any courses yet.</p>
+            <button className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md transition duration-200">
+              Browse Courses
+            </button>
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
-}
+};
+
+export default Home;

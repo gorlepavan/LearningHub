@@ -6,7 +6,6 @@ import Home from './components/Home';
 import Admin from './components/Admin';
 import LandingPage from './components/LandingPage';
 import CourseDetail from './components/CourseDetail';
-import InstructorDashboard from './components/InstructorDashboard';
 
 function App() {
   return (
@@ -17,7 +16,6 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<Home />} />
         <Route path="/admin" element={<Admin />} />
-        <Route path="/instructor" element={<InstructorDashboard />} />
         <Route path="/course/:courseId" element={<CourseDetail />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
